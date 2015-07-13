@@ -2,6 +2,9 @@ public static class Key {
   private static int pressTime[] = null;
   private static boolean keyOff[] = null;
 
+  private Key() {
+  }
+
   public static void setApplet(PApplet applet) {
     pressTime = new int[Character.MAX_VALUE];
     keyOff = new boolean[Character.MAX_VALUE];
@@ -20,6 +23,8 @@ public static class Key {
       }
     }
     );
+
+    applet.registerMethod("post", new Key());
   }
 
   public static int get(int code) {
@@ -35,7 +40,7 @@ public static class Key {
     return pressed(code)||(get(code)>=n&&get(code)%m==0);
   }
 
-  public static void update() {
+  public static void post() {
     for (int i=0; i<pressTime.length; i++) {
       pressTime[i]+=pressTime[i]!=0?1:0;
       if (keyOff[i]) {

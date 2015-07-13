@@ -47,8 +47,6 @@ void draw() {
     playedit.edit();
     break;
   }
-
-  Key.update();
 }
 
 public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {

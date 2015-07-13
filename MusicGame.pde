@@ -1,6 +1,7 @@
 import ddf.minim.*;
 import java.io.*;
 import java.util.Collections;
+import keymanager.Key;
 
 Minim minim;
 

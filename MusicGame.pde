@@ -14,7 +14,7 @@ void setup() {
   dec = minim.loadSnippet("se/decide18.wav");
 
   size(500, 650);
-  textFont(createFont("Buxton Sketch", 40));
+  textFont(loadFont("BuxtonSketch-40.vlw"));
 
   File songs = new File(dataPath("song"));
   for (File f : songs.listFiles ()) {

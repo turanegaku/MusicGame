@@ -5,14 +5,14 @@ import keymanager.Key;
 
 Minim minim;
 
-AudioSnippet swi, dec;
+AudioSample swi, dec;
 
 void setup() {
   Key.setApplet(this);
   minim = new Minim(this);
 
-  swi = minim.loadSnippet("se/032-Switch01.mp3");
-  dec = minim.loadSnippet("se/decide18.wav");
+  swi = minim.loadSample("se/032-Switch01.mp3");
+  dec = minim.loadSample("se/decide18.wav");
 
   size(500, 650);
   textFont(loadFont("BuxtonSketch-40.vlw"));
@@ -25,13 +25,11 @@ void setup() {
 }
 
 void playSwitch() {
-  swi.rewind();
-  swi.play();
+  swi.trigger();
 }
 
 void playDecide() {
-  dec.rewind();
-  dec.play();
+  dec.trigger();
 }
 
 void draw() {

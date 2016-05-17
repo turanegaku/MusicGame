@@ -9,7 +9,6 @@ public class PlayEdit {
   private Score score;
   private ArrayList<Note> note = new ArrayList<Note>();
   private AudioPlayer song;
-  private ArrayList<Integer> result;
   private int point;
   private float per, per2;
   private int ready;
@@ -21,25 +20,8 @@ public class PlayEdit {
 
   private ArrayList<Popup> popup=new ArrayList<Popup>();
 
+  private int moveammount = 2;
   int wheel = 0;
-
-  private void saveScore() {
-    score.note.clear();
-    score.note.addAll(note);
-    File f = new File(dataPath("score/"+name+".sc"));
-    try {
-      ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(f));
-      os.writeInt(note.size());
-      for (Note n : note)
-        os.writeObject(n);
-      os.close();
-
-      println("score saveDone");
-    }
-    catch(Exception e) {
-      e.printStackTrace();
-    }
-  }
 
   public void setScore(Score s) {
     score = s;
@@ -47,7 +29,6 @@ public class PlayEdit {
     name = s.name;
     note.clear();
     note.addAll(s.note);
-    result = s.result;
     resetScore();
   }
 
@@ -65,26 +46,6 @@ public class PlayEdit {
 
     popup.clear();
     Res.back();
-  }
-
-  private void saveResult() {
-    result.add(int(per2*100000));
-    Collections.sort(result);
-    Collections.reverse(result);
-
-    File f = new File(dataPath("result/"+name+".rs"));
-    try {
-      ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(f));
-      for (int i=0; i<5; i++)
-        os.writeInt(result.get(i));
-
-      os.close();
-
-      println("result saveDone");
-    }
-    catch(Exception e) {
-      e.printStackTrace();
-    }
   }
 
   private void update() {
@@ -132,6 +93,14 @@ public class PlayEdit {
       ellipse(80+n.pos*55, height-30+(song.position()-n.time)/5*speed, 40, 20);
     }
 
+    stroke(255, 100);
+    for (int i = 0; score.ab.t + i * score.ab.barms () < song.length(); i++) {
+      float y = height-30+(song.position()-(score.ab.t + i*score.ab.barms()))/5*speed;
+      if (y < 0 || height <= y)continue;
+      line(60, y, 80+7*55+20, y);
+    }
+
+    stroke(0);
     strokeWeight(3);
     fill(50);
     rect(0, 0, width, 30);
@@ -174,7 +143,7 @@ public class PlayEdit {
         if (Key.pressed('K'))
           Res.back();
         if (Key.pressed(ENTER)) {
-          saveResult();
+          score.saveResult(per2);
           switch(Res.get()) {
           case Title:
             Scene.to(Scene.Title);
@@ -224,7 +193,7 @@ public class PlayEdit {
 
       for (Note n : note) {
         if (n.mark != Mark.none)continue;
-        int diff = song.position()-n.time;
+        int diff = song.position()-n.time-40;
         if (diff > 200) { //過ぎ去っていたらbad
           n.mark = Mark.bad;
           point --;
@@ -269,7 +238,7 @@ public class PlayEdit {
     if (Key.get(CONTROL)>0) {
       if (Key.pressed('S')) {
         Collections.sort(note);
-        saveScore();
+        score.saveScore(note);
       }
       if (Key.pressed('D')) {
         Scene.to(Scene.Title);
@@ -283,17 +252,63 @@ public class PlayEdit {
       }
       if (Key.pressed('L'))
         song.rewind();
-      if (Key.pushed('J', 30, 3))
-        song.skip(100);
-      if (Key.pushed('K', 30, 3))
-        song.skip(-100);
+      if (Key.pushed('J', 30, 3)) {
+        float t = song.position()+1;
+        t -= score.ab.t;
+        t = ceil(t/(score.ab.beatms()/moveammount))*(score.ab.beatms()/moveammount);
+        t += score.ab.t;
+        song.cue((int)t);
+      }
+      if (Key.pushed('K', 30, 3)) {
+        float t = song.position();
+        t -= score.ab.t;
+        t = int(t/(score.ab.beatms()/moveammount))*(score.ab.beatms()/moveammount);
+        t += score.ab.t;
+        song.cue((int)t);
+      }
+      if (Key.pushed(DOWN, 30, 3))
+        song.skip(-10);
+      if (Key.pushed(UP, 30, 3))
+        song.skip(10);
+    } else if (Key.get('4') > 0) {
+      if (Key.pressed(UP)) {
+        score.ab.t+=score.ab.beatms();
+      }
+      if (Key.pressed(DOWN)) {
+        score.ab.t-=score.ab.beatms();
+      }
+    } else if (Key.get('8') > 0) {
+      if (Key.pressed(UP)) {
+        score.ab.t+=score.ab.beatms()/2;
+      }
+      if (Key.pressed(DOWN)) {
+        score.ab.t-=score.ab.beatms()/2;
+      }
     } else {
+      if (Key.pressed('1')) {
+        moveammount = 4;
+      }else if (Key.pressed('2')) {
+        moveammount = 2;
+      }else if (Key.pressed('3')) {
+        moveammount = 1;
+      }
       for (int i=0; i<8; i++) {
         Note n = new Note(song.position(), i);
         if (Key.pressed(keys[i]) && !note.contains(n)) {
           note.add(n);
         }
       }
+      
+      if (Key.pushed('Z', 30, 3)){
+        for(Note n :note){
+          n.time += score.ab.beatms()/2;
+        }
+      }
+
+      if (Key.pushed(DOWN, 30, 3))
+        song.skip(-100);
+      if (Key.pushed(UP, 30, 3))
+        song.skip(100);
     }
 
     if (Key.pressed(' ')) {

@@ -71,7 +71,8 @@ public class Title {
 
     fill(255, 255-abs(min(deep-2, 0))*180);
     textSize(25);
-    text("speed : "+nf(playedit.speed, 0, 1), 30+(2-deep)*120, 50);
+    if (!score.get(scoreidx).ab.isAlive())
+      text("bpm : "+score.get(scoreidx).ab.getBPM()[0].bpm, 30+(2-deep)*120, 50);
     for (int i=0; i<5; i++) {
       int res = score.get(scoreidx).result.get(i);
       fill(255, 255-abs(min(deep-2, 0))*120);
@@ -82,6 +83,9 @@ public class Title {
 
 
     if (deep == 2) {
+      fill(255);
+      textSize(25);
+      text("speed : "+nf(playedit.speed, 0, 1), 240, 50);
       fill(200, 200, 255, abs(cos(PI/80*cnt++))*255);
       textSize(30);
       text(Tit.get().name+" to Press Enter Key!!", 120, 250);

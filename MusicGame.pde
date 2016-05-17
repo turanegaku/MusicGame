@@ -19,7 +19,7 @@ void setup() {
 
   File songs = new File(dataPath("song"));
   for (File f : songs.listFiles ()) {
-    score.add(new Score(f.getName(), minim.loadFile(f.getPath())));
+    score.add(new Score(f));
     println(f.getName());
   }
 }
@@ -55,3 +55,14 @@ public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
 public void keyPressed(java.awt.event.KeyEvent e) {
 }
 
+void stop(){
+  println(235);
+  swi.close();
+  dec.close();
+  for(Score s:score){
+    s.song.close();
+  }
+  minim.stop();
+  
+  super.stop();
+}
